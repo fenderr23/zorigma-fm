@@ -600,7 +600,7 @@
 
 /* Корпус — очень тёмный розовый */
 .theme-барби .ipod-body {
-  background: #d63c94;
+  background: #d63c939e;
   border: 2px solid rgba(255, 255, 255, 0.3);
   box-shadow:
     -3px -3px 8px rgba(255, 255, 255, 0.2),
