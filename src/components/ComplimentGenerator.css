@@ -74,23 +74,26 @@
 }
 
 .compliment-card.tender {
-  background: linear-gradient(135deg, #F0D0C8 0%, #E8B4B8 100%);
-  color: #5D3A30;
+  background: linear-gradient(135deg, #3A2522 0%, #4A2D2F 100%);
+  color: #E8B4B8;
+  border: 1px solid rgba(181, 101, 107, 0.3);
 }
 
 .compliment-card.funny {
-  background: linear-gradient(135deg, #D4C8A0 0%, #C8B888 100%);
-  color: #4A4030;
+  background: linear-gradient(135deg, #2A2A20 0%, #3A3528 100%);
+  color: #C8B888;
+  border: 1px solid rgba(165, 150, 100, 0.3);
 }
 
 .compliment-card.personal {
-  background: linear-gradient(135deg, #D4A574 0%, #C49060 100%);
-  color: #3A2818;
+  background: linear-gradient(135deg, #3A2818 0%, #4A3018 100%);
+  color: #C49060;
+  border: 1px solid rgba(196, 144, 96, 0.3);
 }
 
 .compliment-card.super {
-  background: linear-gradient(135deg, #D4A574 0%, #E8B4B8 100%);
-  color: #2C1810;
+  background: linear-gradient(135deg, #3A2818 0%, #4A2D2F 100%);
+  color: #E8D5C0;
   border: 2px solid var(--color-primary);
   animation: warmGlow 2s infinite;
 }
@@ -178,8 +181,8 @@
 
 .generate-button:hover:not(:disabled) {
   box-shadow:
-    -6px -6px 18px rgba(255, 255, 255, 0.85),
-    6px 6px 18px rgba(44, 24, 16, 0.13);
+    -6px -6px 18px rgba(255, 255, 255, 0.08),
+    6px 6px 18px rgba(0, 0, 0, 0.4);
 }
 
 .generate-button:active:not(:disabled) {

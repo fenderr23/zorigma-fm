@@ -7,6 +7,75 @@
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
+/* Навбар */
+.app-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  background: rgba(13, 13, 13, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 105, 180, 0.1);
+  z-index: 1000;
+}
+
+.navbar-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.navbar-settings {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-settings:hover {
+  color: var(--color-primary);
+  background: rgba(255, 105, 180, 0.1);
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-cake {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-cake:hover {
+  color: var(--color-primary);
+  background: rgba(255, 105, 180, 0.1);
+}
+
 /* Плавающая кнопка редактирования — Neumorphism */
 .floating-edit-button {
   position: fixed;
@@ -40,7 +109,7 @@
 
 .editor-wrapper {
   min-height: 100vh;
-  padding: 2rem;
+  padding: 5rem 2rem 2rem;
   background: var(--color-bg);
 }
 
@@ -60,7 +129,7 @@
 .loading-spinner {
   width: 60px;
   height: 60px;
-  border: 4px solid rgba(212, 165, 116, 0.3);
+  border: 4px solid rgba(255, 105, 180, 0.3);
   border-radius: 50%;
   border-top-color: var(--color-primary);
   margin-bottom: var(--spacing-xl);
@@ -156,7 +225,7 @@
     height: 45px;
     font-size: 1.2rem;
   }
-  .editor-wrapper { padding: 1rem; }
+  .editor-wrapper { padding: 4.5rem 1rem 1rem; }
 }
 
 @media (max-width: 480px) {
@@ -167,4 +236,69 @@
     height: 40px;
     font-size: 1.1rem;
   }
+}
+
+
+
+/* ===== ТЕМА БАРБИ ===== */
+
+.theme-барби {
+  background: #FFE4E1;
+  color: #FF1493;
+}
+
+.theme-барби .app-navbar {
+  background: rgba(255, 228, 225, 0.95);
+  border-bottom: 2px solid #FFB6C1;
+}
+
+.theme-барби .navbar-title {
+  color: #FF1493;
+}
+
+.theme-барби .navbar-settings {
+  color: #FF69B4;
+}
+
+.theme-барби .navbar-settings:hover {
+  color: #FF1493;
+  background: rgba(255, 105, 180, 0.1);
+}
+
+.theme-барби .editor-wrapper {
+  background: #FFE4E1;
+}
+
+.theme-барби .app-loading {
+  background: #FFE4E1;
+  color: #FF1493;
+}
+
+.theme-барби .loading-spinner {
+  border-color: rgba(255, 105, 180, 0.3);
+  border-top-color: #FF69B4;
+}
+
+.theme-барби .app-loading h1 {
+  color: #FF1493;
+}
+
+.theme-барби .app-loading p {
+  color: #FF69B4;
+}
+
+.theme-барби .app-error {
+  background: #FFE4E1;
+  color: #FF1493;
+}
+
+.theme-барби .app-error button {
+  background: #FFE4EC;
+  color: #FF1493;
+  border: 2px solid #FFB6C1;
+}
+
+.theme-барби .app-error button:hover {
+  background: #FFB6C1;
+  color: #FFFFFF;
 }

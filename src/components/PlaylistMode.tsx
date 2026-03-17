@@ -10,6 +10,10 @@ interface PlaylistModeProps {
 const PlaylistMode: React.FC<PlaylistModeProps> = ({ tracks }) => {
   const [selectedTrackIndex, setSelectedTrackIndex] = useState<number>(0)
   const [displayMode, setDisplayMode] = useState<'list' | 'detail'>('list')
+  const normalizeTrackTitle = (title: string) => {
+    if (!title) return title
+    return title.charAt(0).toLocaleLowerCase() + title.slice(1)
+  }
 
   const selectedTrack = tracks[selectedTrackIndex]
 
@@ -59,7 +63,7 @@ const PlaylistMode: React.FC<PlaylistModeProps> = ({ tracks }) => {
                 >
                   <div className="track-number">{track.order}</div>
                   <div className="track-info">
-                    <h4 className="track-title">{track.title}</h4>
+                    <h4 className="track-title">{normalizeTrackTitle(track.title)}</h4>
                     <p className="track-preview">
                       {track.description.length > 60 
                         ? `${track.description.substring(0, 60)}...` 
@@ -101,7 +105,7 @@ const PlaylistMode: React.FC<PlaylistModeProps> = ({ tracks }) => {
               <div className="track-header">
                 <div className="track-number-large">{selectedTrack.order}</div>
                 <div className="track-header-info">
-                  <h3 className="track-detail-title">{selectedTrack.title}</h3>
+                  <h3 className="track-detail-title">{normalizeTrackTitle(selectedTrack.title)}</h3>
                   <p className="track-position">
                     Трек {selectedTrackIndex + 1} из {tracks.length}
                   </p>

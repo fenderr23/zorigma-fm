@@ -6,6 +6,9 @@ export interface Track {
   description: string
   order: number
   mediaUrl?: string
+  audioUrl?: string
+  artist?: string
+  realTitle?: string
 }
 
 export interface Compliment {
@@ -20,6 +23,7 @@ export interface GreetingSettings {
   fontFamily: 'monospace' | 'grotesque'
   autoPlay: boolean
   showTutorial: boolean
+  theme?: 'baddie' | 'батя' | 'барби'
 }
 
 export interface GreetingData {

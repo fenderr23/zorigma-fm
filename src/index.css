@@ -1,16 +1,6 @@
-/* Базовые стили и CSS переменные — Vintage Analog + Neumorphism */
+/* Базовые стили и CSS переменные — Система тем */
 
 :root {
-  /* Vintage Analog палитра */
-  --color-bg: #F5E6C8;
-  --color-surface: #FFF8F0;
-  --color-primary: #D4A574;
-  --color-secondary: #E8B4B8;
-  --color-accent: #4A7B7C;
-  --color-text: #2C1810;
-  --color-text-secondary: #6B5B4E;
-  --color-btn-surface: #EDE0D0;
-
   /* Шрифты */
   --font-display: 'Special Elite', 'Courier New', monospace;
   --font-body: 'Lora', 'Georgia', serif;
@@ -24,15 +14,6 @@
   --spacing-xl: 2rem;
   --spacing-xxl: 3rem;
 
-  /* Neumorphism тени */
-  --shadow-neu-out:
-    -5px -5px 15px rgba(255, 255, 255, 0.8),
-    5px 5px 15px rgba(0, 0, 0, 0.1);
-  --shadow-neu-in:
-    inset -2px -2px 6px rgba(255, 255, 255, 0.7),
-    inset 2px 2px 6px rgba(0, 0, 0, 0.1);
-  --shadow-soft: 0 4px 12px rgba(44, 24, 16, 0.08);
-
   /* Скругления */
   --radius-sm: 6px;
   --radius-md: 12px;
@@ -45,8 +26,71 @@
   --transition-slow: 400ms ease-out;
 
   /* Film grain */
-  --grain-opacity: 0.12;
-  --warm-filter: sepia(8%) contrast(1.03) saturate(0.92);
+  --grain-opacity: 0.1;
+  --warm-filter: brightness(1) contrast(1.05);
+}
+
+/* Тема Baddie (Emo / Neon Pink) */
+:root,
+.theme-baddie {
+  --color-bg: #1A0F18;
+  --color-surface: #1A1A1A;
+  --color-primary: #FF69B4;
+  --color-secondary: #FF85C8;
+  --color-accent: #FF3399;
+  --color-text: #F0E6F0;
+  --color-text-secondary: #C0A0B0;
+  --color-btn-surface: #222222;
+
+  /* Neumorphism тени — тёмные с розовым */
+  --shadow-neu-out:
+    -4px -4px 12px rgba(255, 105, 180, 0.05),
+    4px 4px 12px rgba(0, 0, 0, 0.6);
+  --shadow-neu-in:
+    inset -2px -2px 6px rgba(255, 105, 180, 0.03),
+    inset 2px 2px 6px rgba(0, 0, 0, 0.6);
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Тема Батя (заглушка — описание будет позже) */
+.theme-батя {
+  --color-bg: #1E1B1A;
+  --color-surface: #2A1E1C;
+  --color-primary: #D4AF37;
+  --color-secondary: #CD7F32;
+  --color-accent: #FF8C00;
+  --color-text: #D4AF37;
+  --color-text-secondary: #B8860B;
+  --color-btn-surface: #3D2817;
+
+  --shadow-neu-out:
+    -4px -4px 12px rgba(212, 175, 55, 0.08),
+    4px 4px 12px rgba(30, 27, 26, 0.5);
+  --shadow-neu-in:
+    inset -2px -2px 6px rgba(212, 175, 55, 0.05),
+    inset 2px 2px 6px rgba(30, 27, 26, 0.5);
+  --shadow-soft: 0 4px 12px rgba(30, 27, 26, 0.4);
+}
+
+/* Тема Барби (Гламурный розовый с блёстками) */
+.theme-барби {
+  --color-bg: #FFE4E1;
+  --color-surface: #d63c9335;
+  --color-primary: #c55f9291;
+  --color-secondary: #FF1493;
+  --color-accent: #FFD700;
+  --color-text: #FF1493;
+  --color-text-secondary: #FF69B4;
+  --color-btn-surface: #FFE4EC;
+
+  /* Neumorphism тени — светлые розовые */
+  --shadow-neu-out:
+    -4px -4px 12px rgba(255, 255, 255, 0.9),
+    4px 4px 12px rgba(255, 105, 180, 0.2);
+  --shadow-neu-in:
+    inset -2px -2px 6px rgba(255, 255, 255, 0.8),
+    inset 2px 2px 6px rgba(255, 105, 180, 0.12);
+  --shadow-soft: 0 4px 12px rgba(255, 105, 180, 0.15);
 }
 
 /* Сброс стилей */
@@ -120,8 +164,8 @@ body {
 }
 
 @keyframes warmGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(212, 165, 116, 0.2); }
-  50% { box-shadow: 0 0 30px rgba(212, 165, 116, 0.35); }
+  0%, 100% { box-shadow: 0 0 20px rgba(255, 105, 180, 0.2); }
+  50% { box-shadow: 0 0 30px rgba(255, 105, 180, 0.4); }
 }
 
 .fade-in {

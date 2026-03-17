@@ -19,7 +19,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow-neu-in);
-  border: 1px solid rgba(212, 165, 116, 0.15);
+  border: 1px solid rgba(196, 144, 96, 0.12);
 }
 
 .display-content {
@@ -91,8 +91,8 @@
 
 .control-button:hover {
   box-shadow:
-    -6px -6px 18px rgba(255, 255, 255, 0.85),
-    6px 6px 18px rgba(44, 24, 16, 0.13);
+    -6px -6px 18px rgba(255, 255, 255, 0.08),
+    6px 6px 18px rgba(0, 0, 0, 0.4);
   color: var(--color-text);
 }
 

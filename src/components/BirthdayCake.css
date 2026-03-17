@@ -1,0 +1,468 @@
+/* BirthdayCake — Интерактивная страница с тортом */
+
+.cake-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--color-bg);
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.cake-page .back-button {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: var(--color-btn-surface);
+  border: none;
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: var(--shadow-neu-out);
+  transition: all var(--transition-fast);
+}
+
+.cake-page .back-button:hover {
+  color: var(--color-primary);
+}
+
+/* Видео с камеры — фон */
+.camera-feed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.15;
+  transform: scaleX(-1);
+  pointer-events: none;
+}
+
+/* Стартовый экран */
+.cake-start-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  z-index: 5;
+  text-align: center;
+}
+
+.cake-start-screen h2 {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--color-primary);
+  letter-spacing: 1px;
+}
+
+.cake-start-screen p {
+  font-family: var(--font-body);
+  color: var(--color-text-secondary);
+  max-width: 360px;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.cake-hint {
+  font-size: 0.8rem;
+  opacity: 0.5;
+  color: var(--color-text-secondary);
+}
+
+.loading-dots {
+  display: flex;
+  gap: 4px;
+  font-size: 2rem;
+  color: var(--color-primary);
+}
+
+.loading-dots span:nth-child(1) { animation: pulse 1s infinite 0s; }
+.loading-dots span:nth-child(2) { animation: pulse 1s infinite 0.2s; }
+.loading-dots span:nth-child(3) { animation: pulse 1s infinite 0.4s; }
+
+.start-btn {
+  background: var(--color-primary);
+  color: #000;
+  border: none;
+  padding: 14px 36px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 0 20px rgba(255, 105, 180, 0.3);
+}
+
+.start-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 30px rgba(255, 105, 180, 0.5);
+}
+
+/* Сцена с тортом */
+.cake-scene {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cake-instruction {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-primary);
+  margin-bottom: 20px;
+  text-align: center;
+  animation: pulse 2s infinite;
+}
+
+/* Торт */
+.cake-container {
+  position: relative;
+  width: min(320px, 90vw);
+}
+
+/* Свечи */
+.candles-row {
+  display: flex;
+  justify-content: center;
+  gap: clamp(20px, 6vw, 36px);
+  margin-bottom: -2px;
+}
+
+.candle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.candle-body {
+  width: 10px;
+  height: 50px;
+  border-radius: 3px 3px 0 0;
+  position: relative;
+}
+
+.candle:nth-child(1) .candle-body { background: linear-gradient(to bottom, #FF69B4, #FF1493); }
+.candle:nth-child(2) .candle-body { background: linear-gradient(to bottom, #87CEEB, #4682B4); }
+.candle:nth-child(3) .candle-body { background: linear-gradient(to bottom, #FFD700, #FFA500); }
+.candle:nth-child(4) .candle-body { background: linear-gradient(to bottom, #98FB98, #32CD32); }
+.candle:nth-child(5) .candle-body { background: linear-gradient(to bottom, #DDA0DD, #9370DB); }
+
+.candle-wick {
+  width: 2px;
+  height: 8px;
+  background: #333;
+  border-radius: 1px;
+  margin-bottom: 2px;
+}
+
+/* Пламя */
+.flame-wrapper {
+  position: relative;
+  width: 20px;
+  height: 30px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.candle.lit .flame-wrapper {
+  opacity: 1;
+}
+
+.flame {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 20px;
+  background: radial-gradient(ellipse at bottom, #FFD700 0%, #FF8C00 40%, #FF4500 70%, transparent 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: flicker 0.3s infinite alternate;
+}
+
+.flame::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 10px;
+  background: radial-gradient(ellipse at bottom, #FFF 0%, #FFD700 60%, transparent 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+
+/* Пламя гаснет */
+.candle.blowing-out .flame-wrapper {
+  animation: blowOut 0.5s forwards;
+}
+
+@keyframes flicker {
+  0% { transform: translateX(-50%) scale(1) rotate(-2deg); }
+  50% { transform: translateX(-50%) scale(1.05, 0.95) rotate(1deg); }
+  100% { transform: translateX(-50%) scale(0.95, 1.05) rotate(-1deg); }
+}
+
+@keyframes blowOut {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3, 0.5) translateX(10px); }
+  100% { opacity: 0; transform: scale(0); }
+}
+
+/* Тело торта */
+.cake-body {
+}
+
+.cake-layer {
+  margin: 0 auto;
+  border-radius: 8px;
+  position: relative;
+}
+
+.cake-layer-top {
+  width: min(280px, 82vw);
+  height: 50px;
+  background: linear-gradient(to bottom, #FFB6C1, #FF69B4);
+  border-radius: 12px 12px 0 0;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.cake-layer-top::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 15px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+  border-radius: 12px 12px 0 0;
+}
+
+.cake-frosting {
+  width: min(290px, 85vw);
+  height: 20px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.cake-frosting svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cake-layer-bottom {
+  width: min(300px, 88vw);
+  height: 70px;
+  background: linear-gradient(to bottom, #DEB887, #D2691E);
+  border-radius: 0 0 16px 16px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.cake-layer-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: rgba(0,0,0,0.1);
+  border-radius: 0 0 16px 16px;
+}
+
+.cake-plate {
+  width: min(340px, 92vw);
+  height: 16px;
+  background: linear-gradient(to bottom, #C0C0C0, #A0A0A0);
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  margin: 0 auto;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Зажигалка */
+.lighter {
+  position: fixed;
+  pointer-events: none;
+  z-index: 20;
+  transition: left 0.05s linear, top 0.05s linear;
+}
+
+.lighter-body {
+  width: 28px;
+  height: 52px;
+  background: linear-gradient(135deg, #C0392B, #E74C3C);
+  border-radius: 6px 6px 8px 8px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.lighter-body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background: linear-gradient(to bottom, #BDC3C7, #95A5A6);
+  border-radius: 6px 6px 2px 2px;
+}
+
+.lighter-body::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 8px;
+  background: #7F8C8D;
+  border-radius: 2px 2px 0 0;
+}
+
+.lighter-flame-tip {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 18px;
+  background: radial-gradient(ellipse at bottom, #FFD700, #FF4500, transparent);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: flicker 0.2s infinite alternate;
+}
+
+/* Индикатор микрофона */
+.mic-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.mic-bar {
+  width: 120px;
+  height: 8px;
+  background: var(--color-surface);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mic-bar-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 4px;
+  transition: width 0.1s;
+}
+
+/* ASCII конфетти */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 50;
+  overflow: hidden;
+}
+
+.confetti-char {
+  position: absolute;
+  font-size: 1.5rem;
+  animation: confettiFall linear forwards;
+  pointer-events: none;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-20px) rotate(0deg);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Поздравительный текст после конфетти */
+.celebration-text {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 60;
+  text-align: center;
+  animation: celebrationAppear 1s ease-out forwards;
+}
+
+.celebration-text h1 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+  text-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+}
+
+.celebration-text p {
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  color: var(--color-text);
+  opacity: 0.8;
+}
+
+@keyframes celebrationAppear {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Счетчик свечей */
+.candle-counter {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-top: 12px;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .cake-start-screen h2 {
+    font-size: 1.4rem;
+  }
+  .celebration-text h1 {
+    font-size: 1.8rem;
+  }
+  .candle-body {
+    height: 40px;
+    width: 8px;
+  }
+  .cake-layer-top {
+    height: 40px;
+  }
+  .cake-layer-bottom {
+    height: 55px;
+  }
+}
