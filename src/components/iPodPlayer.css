@@ -584,7 +584,27 @@
   .wheel-button { font-size: 0.6rem; padding: 5px; }
   .track-title { font-size: 0.9rem; }
   .track-description { font-size: 0.7rem; }
-  .compliment-text { font-size: 0.85rem; }
+  .compliment-display {
+    flex: 1;
+    min-height: 0;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px 8px 6px;
+    overflow: hidden;
+  }
+  .compliment-display.has-super-text {
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+  .compliment-icon { font-size: 2rem; }
+  .compliment-text {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+  .compliment-text.super-text {
+    font-size: 0.86rem;
+    line-height: 1.45;
+  }
 }
 
 

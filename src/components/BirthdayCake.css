@@ -453,7 +453,10 @@
     font-size: 1.4rem;
   }
   .celebration-text h1 {
-    font-size: 1.8rem;
+    font-size: clamp(1.05rem, 4.4vw, 1.25rem);
+    white-space: nowrap;
+    line-height: 1.2;
+    margin-bottom: 10px;
   }
   .candle-body {
     height: 40px;

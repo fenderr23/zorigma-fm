@@ -281,7 +281,10 @@ const IPodPlayer: React.FC<IPodPlayerProps> = ({ tracks, compliments, friendName
             <span className="back-icon" onClick={handleMenuClick}>◀ Menu</span>
             <span className="screen-title">Комплименты</span>
           </div>
-          <div className="compliment-display" key={currentCompliment ? currentCompliment.id : 'empty'}>
+          <div
+            className={`compliment-display ${currentCompliment?.isSuperCompliment ? 'has-super-text' : ''}`}
+            key={currentCompliment ? currentCompliment.id : 'empty'}
+          >
             {currentCompliment ? (
               <div>
                 <div className="compliment-icon">♥</div>
