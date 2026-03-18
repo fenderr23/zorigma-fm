@@ -11,6 +11,7 @@ import {
 
 const GREETING_DATA_KEY = 'zorigma-fm-greeting-data'
 const GREETING_DATA_VERSION = '1.0'
+const GREETING_DATA_URL = `${import.meta.env.BASE_URL}greeting.json`
 
 /**
  * Загружает данные поздравления из greeting.json файла
@@ -18,7 +19,7 @@ const GREETING_DATA_VERSION = '1.0'
 export async function loadGreetingData(): Promise<GreetingData> {
   try {
     // Пробуем загрузить из файла
-    const response = await fetch('/greeting.json')
+    const response = await fetch(GREETING_DATA_URL)
     
     if (!response.ok) {
       throw new Error(`Failed to load greeting.json: ${response.status}`)
