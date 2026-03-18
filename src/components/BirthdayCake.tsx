@@ -51,7 +51,8 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
   // Чередующиеся подсказки
   const [hintIndex, setHintIndex] = useState(0)
   const hints = [
-    'помаши рукой плиз чтобы камера тебя увидела',
+
+    'если ты с компа то помаши рукой плиз чтобы камера тебя увидела',
     'сверху палец над свечками наводи чтобы зажечь фитиль'
   ]
 
@@ -303,9 +304,9 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
         <div className="cake-start-screen">
           <h2>Задуй свечи!</h2>
           <p>
-            Зажги свечи на торте пальцем через камеру, а потом подуй в микрофон чтобы их задуть
+            Зажги свечи на торте пальцем, а потом подуй в микрофон чтобы их задуть
           </p>
-          <p className="cake-hint">Если камера не работает — можно мышкой</p>
+          <p className="cake-hint">если камера не работает — можно мышкой</p>
           <button className="start-btn" onClick={handleStart}>
             Начать
           </button>
