@@ -245,7 +245,18 @@ const IPodPlayer: React.FC<IPodPlayerProps> = ({ tracks, compliments, friendName
       return (
         <div className="ipod-screen-content nowplaying-screen" style={{ padding: 0, position: 'relative' }}>
           {currentTrack.mediaUrl ? (
-            <img src={currentTrack.mediaUrl} alt={currentTrack.title} style={{ width: '100%', height: '100%', objectFit: (currentTrack as any).mediaFit === 'contain' ? 'contain' : 'cover', display: 'block', background: '#000000' }} />
+            <img
+              src={currentTrack.mediaUrl}
+              alt={currentTrack.title}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: (currentTrack as any).mediaFit === 'contain' ? 'contain' : 'cover',
+                objectPosition: (currentTrack as any).mediaPosition || 'center',
+                display: 'block',
+                background: '#000000'
+              }}
+            />
           ) : (
             <div className="cover-placeholder" style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem' }}>♫</div>
           )}
@@ -255,12 +266,12 @@ const IPodPlayer: React.FC<IPodPlayerProps> = ({ tracks, compliments, friendName
             background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
             display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#F5F0EB', fontFamily: 'var(--font-display)' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', minWidth: 0, flex: 1 }}>
+              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#F5F0EB', fontFamily: 'var(--font-display)', whiteSpace: 'nowrap', lineHeight: 1 }}>
                 {currentTrack.realTitle || currentTrack.title}
               </span>
               {currentTrack.artist && (
-                <span style={{ fontSize: '0.7rem', opacity: 0.7, color: '#F5F0EB' }}>
+                <span style={{ fontSize: '0.72rem', opacity: 0.7, color: '#F5F0EB', whiteSpace: 'nowrap', lineHeight: 1 }}>
                   — {currentTrack.artist}
                 </span>
               )}

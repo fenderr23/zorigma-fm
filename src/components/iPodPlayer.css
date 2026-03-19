@@ -557,7 +557,7 @@
 
 /* Адаптивность */
 @media (max-width: 768px) {
-  .ipod-container { padding: 1rem; }
+  .ipod-container { padding: 1rem; padding-top: 84px; }
   .ipod-body {
     width: 350px;
     padding: 25px;
@@ -572,6 +572,9 @@
 }
 
 @media (max-width: 480px) {
+  .ipod-container {
+    padding-top: 92px;
+  }
   .ipod-body {
     width: 300px;
     padding: 20px;
