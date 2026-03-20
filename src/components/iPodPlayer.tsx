@@ -266,12 +266,12 @@ const IPodPlayer: React.FC<IPodPlayerProps> = ({ tracks, compliments, friendName
             background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
             display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end'
           }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', minWidth: 0, flex: 1 }}>
-              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#F5F0EB', fontFamily: 'var(--font-display)', whiteSpace: 'nowrap', lineHeight: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '5px', minWidth: 0, flex: 1, paddingRight: '10px' }}>
+              <span style={{ fontSize: '0.76rem', fontWeight: 600, color: '#F5F0EB', fontFamily: 'var(--font-display)', whiteSpace: 'nowrap', lineHeight: 1 }}>
                 {currentTrack.realTitle || currentTrack.title}
               </span>
               {currentTrack.artist && (
-                <span style={{ fontSize: '0.72rem', opacity: 0.7, color: '#F5F0EB', whiteSpace: 'nowrap', lineHeight: 1 }}>
+                <span style={{ fontSize: '0.66rem', opacity: 0.7, color: '#F5F0EB', whiteSpace: 'nowrap', lineHeight: 1 }}>
                   — {currentTrack.artist}
                 </span>
               )}
