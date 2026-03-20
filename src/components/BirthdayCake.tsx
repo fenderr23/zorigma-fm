@@ -68,10 +68,22 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
   const startCamera = useCallback(async () => {
     setGameState('loading')
     try {
-      const { Hands } = await import('@mediapipe/hands')
-      const { Camera } = await import('@mediapipe/camera_utils')
+      const handsModule = await import('@mediapipe/hands')
+      const cameraModule = await import('@mediapipe/camera_utils')
+      const HandsCtor =
+        (handsModule as any).Hands ??
+        (handsModule as any).default?.Hands ??
+        (handsModule as any).default
+      const CameraCtor =
+        (cameraModule as any).Camera ??
+        (cameraModule as any).default?.Camera ??
+        (cameraModule as any).default
 
-      const hands = new Hands({
+      if (typeof HandsCtor !== 'function' || typeof CameraCtor !== 'function') {
+        throw new Error('MediaPipe constructors are unavailable')
+      }
+
+      const hands = new HandsCtor({
         locateFile: (file: string) =>
           `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
       })
@@ -104,7 +116,7 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
       handsRef.current = hands
 
       if (videoRef.current) {
-        const camera = new Camera(videoRef.current, {
+        const camera = new CameraCtor(videoRef.current, {
           onFrame: async () => {
             if (handsRef.current && videoRef.current) {
               await handsRef.current.send({ image: videoRef.current })
