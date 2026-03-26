@@ -28,7 +28,9 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
   const videoRef = useRef<HTMLVideoElement>(null)
   const candleRefs = useRef<(HTMLDivElement | null)[]>([])
   const handsRef = useRef<any>(null)
-  const cameraRef = useRef<any>(null)
+  const cameraStreamRef = useRef<MediaStream | null>(null)
+  const cameraFrameRef = useRef<number>(0)
+  const isSendingFrameRef = useRef(false)
   const audioContextRef = useRef<AudioContext | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
   const micStreamRef = useRef<MediaStream | null>(null)
@@ -69,18 +71,13 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
     setGameState('loading')
     try {
       const handsModule = await import('@mediapipe/hands')
-      const cameraModule = await import('@mediapipe/camera_utils')
       const HandsCtor =
         (handsModule as any).Hands ??
         (handsModule as any).default?.Hands ??
         (handsModule as any).default
-      const CameraCtor =
-        (cameraModule as any).Camera ??
-        (cameraModule as any).default?.Camera ??
-        (cameraModule as any).default
 
-      if (typeof HandsCtor !== 'function' || typeof CameraCtor !== 'function') {
-        throw new Error('MediaPipe constructors are unavailable')
+      if (typeof HandsCtor !== 'function') {
+        throw new Error('MediaPipe Hands constructor is unavailable')
       }
 
       const hands = new HandsCtor({
@@ -116,17 +113,41 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
       handsRef.current = hands
 
       if (videoRef.current) {
-        const camera = new CameraCtor(videoRef.current, {
-          onFrame: async () => {
-            if (handsRef.current && videoRef.current) {
-              await handsRef.current.send({ image: videoRef.current })
-            }
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error('Camera API is unavailable in this browser')
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'user',
+            width: { ideal: 640 },
+            height: { ideal: 480 }
           },
-          width: 640,
-          height: 480
+          audio: false
         })
-        cameraRef.current = camera
-        await camera.start()
+
+        cameraStreamRef.current = stream
+        videoRef.current.srcObject = stream
+        await videoRef.current.play()
+
+        const processFrame = async () => {
+          if (!videoRef.current || !handsRef.current || isSendingFrameRef.current) {
+            cameraFrameRef.current = requestAnimationFrame(processFrame)
+            return
+          }
+
+          try {
+            isSendingFrameRef.current = true
+            await handsRef.current.send({ image: videoRef.current })
+          } catch (frameError) {
+            console.error('MediaPipe frame processing error:', frameError)
+          } finally {
+            isSendingFrameRef.current = false
+            cameraFrameRef.current = requestAnimationFrame(processFrame)
+          }
+        }
+
+        cameraFrameRef.current = requestAnimationFrame(processFrame)
 
         // Если через 3 сек рука не обнаружена — всё равно переходим в lighting
         setTimeout(() => {
@@ -294,14 +315,15 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
   useEffect(() => {
     return () => {
       cancelAnimationFrame(animFrameRef.current)
+      cancelAnimationFrame(cameraFrameRef.current)
       if (micStreamRef.current) {
         micStreamRef.current.getTracks().forEach(t => t.stop())
       }
+      if (cameraStreamRef.current) {
+        cameraStreamRef.current.getTracks().forEach(t => t.stop())
+      }
       if (audioContextRef.current) {
         audioContextRef.current.close()
-      }
-      if (cameraRef.current) {
-        cameraRef.current.stop()
       }
     }
   }, [])
