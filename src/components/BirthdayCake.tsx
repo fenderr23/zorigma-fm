@@ -7,6 +7,7 @@ const CANDLE_COUNT = 5
 const LIGHT_DISTANCE = 70 // px — зона зажигания
 const LIGHT_TIME = 300 // ms — время удержания
 const BLOW_THRESHOLD = 0.12 // порог громкости
+const MEDIAPIPE_HANDS_VERSION = '0.4.1675469240'
 const CONFETTI_CHARS = ['★', '✦', '♥', '✿', '◆', '●', '♪', '✧', '♡', '⚝']
 const CONFETTI_COLORS = ['#FF69B4', '#FFD700', '#87CEEB', '#98FB98', '#DDA0DD', '#FF6347', '#00CED1']
 
@@ -82,7 +83,7 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
 
       const hands = new HandsCtor({
         locateFile: (file: string) =>
-          `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+          `https://cdn.jsdelivr.net/npm/@mediapipe/hands@${MEDIAPIPE_HANDS_VERSION}/${file}`
       })
 
       hands.setOptions({
