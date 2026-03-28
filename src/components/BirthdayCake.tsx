@@ -7,7 +7,7 @@ const CANDLE_COUNT = 5
 const LIGHT_DISTANCE = 70 // px — зона зажигания
 const LIGHT_TIME = 300 // ms — время удержания
 const BLOW_THRESHOLD = 0.12 // порог громкости
-const HANDS_FRAME_INTERVAL = 1000 / 24
+const HANDS_FRAME_INTERVAL = 1000 / 30
 const MEDIAPIPE_HANDS_VERSION = '0.4.1675469240'
 const MEDIAPIPE_HANDS_SCRIPT_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/hands@${MEDIAPIPE_HANDS_VERSION}/hands.js`
 const CONFETTI_CHARS = ['★', '✦', '♥', '✿', '◆', '●', '♪', '✧', '♡', '⚝']
@@ -50,6 +50,39 @@ function loadMediaPipeHandsScript(): Promise<void> {
   })
 
   return mediaPipeHandsScriptPromise
+}
+
+function mapHandPointToViewport(video: HTMLVideoElement, x: number, y: number) {
+  const viewportWidth = window.innerWidth
+  const viewportHeight = window.innerHeight
+  const videoWidth = video.videoWidth || 640
+  const videoHeight = video.videoHeight || 480
+
+  const videoAspect = videoWidth / videoHeight
+  const viewportAspect = viewportWidth / viewportHeight
+
+  let renderedWidth = viewportWidth
+  let renderedHeight = viewportHeight
+  let offsetX = 0
+  let offsetY = 0
+
+  if (videoAspect > viewportAspect) {
+    renderedHeight = viewportHeight
+    renderedWidth = renderedHeight * videoAspect
+    offsetX = (renderedWidth - viewportWidth) / 2
+  } else {
+    renderedWidth = viewportWidth
+    renderedHeight = renderedWidth / videoAspect
+    offsetY = (renderedHeight - viewportHeight) / 2
+  }
+
+  const screenX = x * renderedWidth - offsetX
+  const screenY = y * renderedHeight - offsetY
+
+  return {
+    x: Math.min(Math.max(screenX, 0), viewportWidth),
+    y: Math.min(Math.max(screenY, 0), viewportHeight)
+  }
 }
 
 interface BirthdayCakeProps {
@@ -129,19 +162,22 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
 
       hands.setOptions({
         maxNumHands: 1,
-        modelComplexity: 0,
-        minDetectionConfidence: 0.5,
-        minTrackingConfidence: 0.5
+        modelComplexity: 1,
+        minDetectionConfidence: 0.45,
+        minTrackingConfidence: 0.45
       })
 
       hands.onResults((results: any) => {
         if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
           const landmarks = results.multiHandLandmarks[0]
           const tip = landmarks[8] // кончик указательного пальца
-          // Зеркалим по X, маппим на экран
-          const x = (1 - tip.x) * window.innerWidth
-          const y = tip.y * window.innerHeight
-          updateLighterPos(x, y)
+          const video = videoRef.current
+          const mirroredX = 1 - tip.x
+          const mappedPoint = video
+            ? mapHandPointToViewport(video, mirroredX, tip.y)
+            : { x: mirroredX * window.innerWidth, y: tip.y * window.innerHeight }
+
+          updateLighterPos(mappedPoint.x, mappedPoint.y)
           handDetectedRef.current = true
 
           if (gameStateRef.current === 'loading') {
@@ -162,8 +198,8 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: 'user',
-            width: { ideal: 480 },
-            height: { ideal: 360 }
+            width: { ideal: 640 },
+            height: { ideal: 480 }
           },
           audio: false
         })
