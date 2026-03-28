@@ -8,8 +8,48 @@ const LIGHT_DISTANCE = 70 // px — зона зажигания
 const LIGHT_TIME = 300 // ms — время удержания
 const BLOW_THRESHOLD = 0.12 // порог громкости
 const MEDIAPIPE_HANDS_VERSION = '0.4.1675469240'
+const MEDIAPIPE_HANDS_SCRIPT_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/hands@${MEDIAPIPE_HANDS_VERSION}/hands.js`
 const CONFETTI_CHARS = ['★', '✦', '♥', '✿', '◆', '●', '♪', '✧', '♡', '⚝']
 const CONFETTI_COLORS = ['#FF69B4', '#FFD700', '#87CEEB', '#98FB98', '#DDA0DD', '#FF6347', '#00CED1']
+
+let mediaPipeHandsScriptPromise: Promise<void> | null = null
+
+function loadMediaPipeHandsScript(): Promise<void> {
+  if (typeof window === 'undefined') {
+    return Promise.reject(new Error('Window is unavailable'))
+  }
+
+  if (typeof (window as any).Hands === 'function') {
+    return Promise.resolve()
+  }
+
+  if (mediaPipeHandsScriptPromise) {
+    return mediaPipeHandsScriptPromise
+  }
+
+  mediaPipeHandsScriptPromise = new Promise((resolve, reject) => {
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      `script[data-mediapipe-hands="${MEDIAPIPE_HANDS_VERSION}"]`
+    )
+
+    if (existingScript) {
+      existingScript.addEventListener('load', () => resolve(), { once: true })
+      existingScript.addEventListener('error', () => reject(new Error('Failed to load MediaPipe Hands script')), { once: true })
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = MEDIAPIPE_HANDS_SCRIPT_URL
+    script.async = true
+    script.crossOrigin = 'anonymous'
+    script.dataset.mediapipeHands = MEDIAPIPE_HANDS_VERSION
+    script.onload = () => resolve()
+    script.onerror = () => reject(new Error('Failed to load MediaPipe Hands script'))
+    document.body.appendChild(script)
+  })
+
+  return mediaPipeHandsScriptPromise
+}
 
 interface BirthdayCakeProps {
   friendName: string
@@ -71,11 +111,8 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
   const startCamera = useCallback(async () => {
     setGameState('loading')
     try {
-      const handsModule = await import('@mediapipe/hands')
-      const HandsCtor =
-        (handsModule as any).Hands ??
-        (handsModule as any).default?.Hands ??
-        (handsModule as any).default
+      await loadMediaPipeHandsScript()
+      const HandsCtor = (window as any).Hands
 
       if (typeof HandsCtor !== 'function') {
         throw new Error('MediaPipe Hands constructor is unavailable')
