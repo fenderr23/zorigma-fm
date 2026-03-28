@@ -7,6 +7,7 @@ const CANDLE_COUNT = 5
 const LIGHT_DISTANCE = 70 // px — зона зажигания
 const LIGHT_TIME = 300 // ms — время удержания
 const BLOW_THRESHOLD = 0.12 // порог громкости
+const HANDS_FRAME_INTERVAL = 1000 / 24
 const MEDIAPIPE_HANDS_VERSION = '0.4.1675469240'
 const MEDIAPIPE_HANDS_SCRIPT_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/hands@${MEDIAPIPE_HANDS_VERSION}/hands.js`
 const CONFETTI_CHARS = ['★', '✦', '♥', '✿', '◆', '●', '♪', '✧', '♡', '⚝']
@@ -60,18 +61,19 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
   const [gameState, setGameState] = useState<GameState>('idle')
   const [litCandles, setLitCandles] = useState<boolean[]>(new Array(CANDLE_COUNT).fill(false))
   const [blowingOut, setBlowingOut] = useState<boolean[]>(new Array(CANDLE_COUNT).fill(false))
-  const [lighterPos, setLighterPos] = useState({ x: -100, y: -100 })
-  const [handDetected, setHandDetected] = useState(false)
   const [micLevel, setMicLevel] = useState(0)
   const [confettiPieces, setConfettiPieces] = useState<Array<{ id: number; char: string; color: string; left: number; delay: number; duration: number }>>([])
   const [showCelebration, setShowCelebration] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
+  const lighterRef = useRef<HTMLDivElement>(null)
   const candleRefs = useRef<(HTMLDivElement | null)[]>([])
   const handsRef = useRef<any>(null)
   const cameraStreamRef = useRef<MediaStream | null>(null)
   const cameraFrameRef = useRef<number>(0)
   const isSendingFrameRef = useRef(false)
+  const handDetectedRef = useRef(false)
+  const lastHandsFrameAtRef = useRef(0)
   const audioContextRef = useRef<AudioContext | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
   const micStreamRef = useRef<MediaStream | null>(null)
@@ -83,7 +85,9 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
 
   const updateLighterPos = useCallback((x: number, y: number) => {
     lighterPosRef.current = { x, y }
-    setLighterPos({ x, y })
+    if (lighterRef.current) {
+      lighterRef.current.style.transform = `translate3d(${x - 14}px, ${y - 80}px, 0)`
+    }
   }, [])
 
   useEffect(() => { litRef.current = litCandles }, [litCandles])
@@ -138,13 +142,13 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
           const x = (1 - tip.x) * window.innerWidth
           const y = tip.y * window.innerHeight
           updateLighterPos(x, y)
-          setHandDetected(true)
+          handDetectedRef.current = true
 
           if (gameStateRef.current === 'loading') {
             setGameState('lighting')
           }
         } else {
-          setHandDetected(false)
+          handDetectedRef.current = false
         }
       })
 
@@ -158,8 +162,8 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: 'user',
-            width: { ideal: 640 },
-            height: { ideal: 480 }
+            width: { ideal: 480 },
+            height: { ideal: 360 }
           },
           audio: false
         })
@@ -174,8 +178,15 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
             return
           }
 
+          const now = performance.now()
+          if (now - lastHandsFrameAtRef.current < HANDS_FRAME_INTERVAL) {
+            cameraFrameRef.current = requestAnimationFrame(processFrame)
+            return
+          }
+
           try {
             isSendingFrameRef.current = true
+            lastHandsFrameAtRef.current = now
             await handsRef.current.send({ image: videoRef.current })
           } catch (frameError) {
             console.error('MediaPipe frame processing error:', frameError)
@@ -206,13 +217,13 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
     if (gameState !== 'lighting' && gameState !== 'loading') return
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!handDetected) {
+      if (!handDetectedRef.current) {
         updateLighterPos(e.clientX, e.clientY)
       }
     }
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (!handDetected && e.touches.length > 0) {
+      if (!handDetectedRef.current && e.touches.length > 0) {
         updateLighterPos(e.touches[0].clientX, e.touches[0].clientY)
       }
     }
@@ -223,7 +234,7 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('touchmove', handleTouchMove)
     }
-  }, [gameState, handDetected])
+  }, [gameState, updateLighterPos])
 
   // Проверяем расстояние зажигалки до свечей
   useEffect(() => {
@@ -360,6 +371,7 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
       if (cameraStreamRef.current) {
         cameraStreamRef.current.getTracks().forEach(t => t.stop())
       }
+      handDetectedRef.current = false
       if (audioContextRef.current) {
         audioContextRef.current.close()
       }
@@ -452,10 +464,10 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
       )}
 
       {/* Зажигалка */}
-      {(gameState === 'lighting') && lighterPos.x > 0 && (
+      {gameState === 'lighting' && (
         <div
+          ref={lighterRef}
           className="lighter"
-          style={{ left: lighterPos.x - 14, top: lighterPos.y - 80 }}
         >
           <div className="lighter-flame-tip" />
           <div className="lighter-body" />

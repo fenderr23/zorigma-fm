@@ -302,7 +302,9 @@
   position: fixed;
   pointer-events: none;
   z-index: 20;
-  transition: left 0.05s linear, top 0.05s linear;
+  transform: translate3d(-120px, -120px, 0);
+  transition: transform 0.05s linear;
+  will-change: transform;
 }
 
 .lighter-body {
