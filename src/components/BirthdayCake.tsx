@@ -4,12 +4,14 @@ import './BirthdayCake.css'
 type GameState = 'idle' | 'loading' | 'lighting' | 'blowing' | 'celebration'
 
 const CANDLE_COUNT = 5
-const LIGHT_DISTANCE = 90 // px — зона зажигания
-const LIGHT_TIME = 220 // ms — время удержания
+const LIGHT_DISTANCE = 40 // px — зона зажигания
+const LIGHT_TIME = 180 // ms — время удержания
 const BLOW_THRESHOLD = 0.12 // порог громкости
 const HANDS_FRAME_INTERVAL = 1000 / 30
 const MEDIAPIPE_HANDS_VERSION = '0.4.1675469240'
 const MEDIAPIPE_HANDS_SCRIPT_URL = `https://cdn.jsdelivr.net/npm/@mediapipe/hands@${MEDIAPIPE_HANDS_VERSION}/hands.js`
+const LIGHTER_FLAME_ANCHOR_X = 14
+const LIGHTER_FLAME_ANCHOR_Y = -4
 const CONFETTI_CHARS = ['★', '✦', '♥', '✿', '◆', '●', '♪', '✧', '♡', '⚝']
 const CONFETTI_COLORS = ['#FF69B4', '#FFD700', '#87CEEB', '#98FB98', '#DDA0DD', '#FF6347', '#00CED1']
 
@@ -141,7 +143,7 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
   const updateLighterPos = useCallback((x: number, y: number) => {
     lighterPosRef.current = { x, y }
     if (lighterRef.current) {
-      lighterRef.current.style.transform = `translate3d(${x - 14}px, ${y - 80}px, 0)`
+      lighterRef.current.style.transform = `translate3d(${x - LIGHTER_FLAME_ANCHOR_X}px, ${y - LIGHTER_FLAME_ANCHOR_Y}px, 0)`
     }
   }, [])
 
