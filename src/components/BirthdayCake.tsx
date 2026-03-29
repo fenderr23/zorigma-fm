@@ -4,8 +4,8 @@ import './BirthdayCake.css'
 type GameState = 'idle' | 'loading' | 'lighting' | 'blowing' | 'celebration'
 
 const CANDLE_COUNT = 5
-const LIGHT_DISTANCE = 70 // px — зона зажигания
-const LIGHT_TIME = 300 // ms — время удержания
+const LIGHT_DISTANCE = 90 // px — зона зажигания
+const LIGHT_TIME = 220 // ms — время удержания
 const BLOW_THRESHOLD = 0.12 // порог громкости
 const HANDS_FRAME_INTERVAL = 1000 / 30
 const MEDIAPIPE_HANDS_VERSION = '0.4.1675469240'
@@ -85,6 +85,27 @@ function mapHandPointToViewport(video: HTMLVideoElement, x: number, y: number) {
   }
 }
 
+function mapHandPointToCakeArea(
+  container: HTMLDivElement,
+  x: number,
+  y: number
+) {
+  const rect = container.getBoundingClientRect()
+  const paddingX = 80
+  const paddingTop = 140
+  const paddingBottom = 90
+
+  const width = rect.width + paddingX * 2
+  const height = rect.height + paddingTop + paddingBottom
+  const left = rect.left - paddingX
+  const top = rect.top - paddingTop
+
+  return {
+    x: Math.min(Math.max(left + x * width, 0), window.innerWidth),
+    y: Math.min(Math.max(top + y * height, 0), window.innerHeight)
+  }
+}
+
 interface BirthdayCakeProps {
   friendName: string
   onBack: () => void
@@ -99,6 +120,7 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
   const [showCelebration, setShowCelebration] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
+  const cakeContainerRef = useRef<HTMLDivElement>(null)
   const lighterRef = useRef<HTMLDivElement>(null)
   const candleRefs = useRef<(HTMLDivElement | null)[]>([])
   const handsRef = useRef<any>(null)
@@ -162,7 +184,7 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
 
       hands.setOptions({
         maxNumHands: 1,
-        modelComplexity: 1,
+        modelComplexity: 0,
         minDetectionConfidence: 0.45,
         minTrackingConfidence: 0.45
       })
@@ -172,10 +194,13 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
           const landmarks = results.multiHandLandmarks[0]
           const tip = landmarks[8] // кончик указательного пальца
           const video = videoRef.current
+          const cakeContainer = cakeContainerRef.current
           const mirroredX = 1 - tip.x
-          const mappedPoint = video
-            ? mapHandPointToViewport(video, mirroredX, tip.y)
-            : { x: mirroredX * window.innerWidth, y: tip.y * window.innerHeight }
+          const mappedPoint = cakeContainer
+            ? mapHandPointToCakeArea(cakeContainer, mirroredX, tip.y)
+            : video
+              ? mapHandPointToViewport(video, mirroredX, tip.y)
+              : { x: mirroredX * window.innerWidth, y: tip.y * window.innerHeight }
 
           updateLighterPos(mappedPoint.x, mappedPoint.y)
           handDetectedRef.current = true
@@ -451,7 +476,7 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
               : 'Подуй в микрофон чтобы задуть свечи!'}
           </div>
 
-          <div className="cake-container">
+          <div ref={cakeContainerRef} className="cake-container">
             <div className="candles-row">
               {Array.from({ length: CANDLE_COUNT }).map((_, i) => (
                 <div
