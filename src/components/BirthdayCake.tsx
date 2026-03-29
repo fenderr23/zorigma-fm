@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import './BirthdayCake.css'
 
 type GameState = 'idle' | 'loading' | 'lighting' | 'blowing' | 'celebration'
+type InputMode = 'desktop-camera' | 'mobile-touch'
 
 const CANDLE_COUNT = 5
 const LIGHT_DISTANCE = 40 // px — зона зажигания
@@ -108,6 +109,20 @@ function mapHandPointToCakeArea(
   }
 }
 
+function getInputMode(): InputMode {
+  if (typeof window === 'undefined') {
+    return 'desktop-camera'
+  }
+
+  const hasCoarsePointer =
+    window.matchMedia('(pointer: coarse)').matches ||
+    window.matchMedia('(any-pointer: coarse)').matches
+
+  return hasCoarsePointer && window.innerWidth <= 900
+    ? 'mobile-touch'
+    : 'desktop-camera'
+}
+
 interface BirthdayCakeProps {
   friendName: string
   onBack: () => void
@@ -115,6 +130,7 @@ interface BirthdayCakeProps {
 
 const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
   const [gameState, setGameState] = useState<GameState>('idle')
+  const [inputMode, setInputMode] = useState<InputMode>(() => getInputMode())
   const [litCandles, setLitCandles] = useState<boolean[]>(new Array(CANDLE_COUNT).fill(false))
   const [blowingOut, setBlowingOut] = useState<boolean[]>(new Array(CANDLE_COUNT).fill(false))
   const [micLevel, setMicLevel] = useState(0)
@@ -140,6 +156,8 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
   const gameStateRef = useRef<GameState>('idle')
   const lighterPosRef = useRef({ x: -100, y: -100 })
 
+  const useCameraInput = inputMode === 'desktop-camera'
+
   const updateLighterPos = useCallback((x: number, y: number) => {
     lighterPosRef.current = { x, y }
     if (lighterRef.current) {
@@ -150,23 +168,61 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
   useEffect(() => { litRef.current = litCandles }, [litCandles])
   useEffect(() => { gameStateRef.current = gameState }, [gameState])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const syncInputMode = () => {
+      setInputMode(getInputMode())
+    }
+
+    const mediaQueries = [
+      window.matchMedia('(pointer: coarse)'),
+      window.matchMedia('(any-pointer: coarse)')
+    ]
+
+    syncInputMode()
+    window.addEventListener('resize', syncInputMode)
+    mediaQueries.forEach(query => query.addEventListener('change', syncInputMode))
+
+    return () => {
+      window.removeEventListener('resize', syncInputMode)
+      mediaQueries.forEach(query => query.removeEventListener('change', syncInputMode))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (useCameraInput) return
+
+    cancelAnimationFrame(cameraFrameRef.current)
+    if (cameraStreamRef.current) {
+      cameraStreamRef.current.getTracks().forEach(track => track.stop())
+      cameraStreamRef.current = null
+    }
+
+    handDetectedRef.current = false
+  }, [useCameraInput])
+
   const allLit = litCandles.every(Boolean)
 
   // Чередующиеся подсказки
   const [hintIndex, setHintIndex] = useState(0)
-  const hints = [
-
-    'если ты с компа то помаши рукой плиз чтобы камера тебя увидела',
-    'сверху палец над свечками наводи чтобы зажечь фитиль'
-  ]
+  const hints = useCameraInput
+    ? [
+        'если ты с компа то помаши рукой плиз чтобы камера тебя увидела',
+        'если камера тупит — можно мышкой поднести зажигалку к фитилю'
+      ]
+    : [
+        'на телефоне просто веди пальцем по экрану — камера не нужна',
+        'поднеси зажигалку к фитилю и подержи чуть-чуть чтобы зажечь свечу'
+      ]
 
   useEffect(() => {
     if (gameState !== 'lighting') return
     const interval = setInterval(() => {
-      setHintIndex(prev => (prev + 1) % 2)
+      setHintIndex(prev => (prev + 1) % hints.length)
     }, 5000)
     return () => clearInterval(interval)
-  }, [gameState])
+  }, [gameState, hints.length])
 
   // Запуск MediaPipe Hands
   const startCamera = useCallback(async () => {
@@ -420,7 +476,14 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
   }
 
   const handleStart = () => {
-    startCamera()
+    if (useCameraInput) {
+      startCamera()
+      return
+    }
+
+    handDetectedRef.current = false
+    updateLighterPos(window.innerWidth / 2, window.innerHeight * 0.72)
+    setGameState('lighting')
   }
 
   // Очистка
@@ -445,15 +508,23 @@ const BirthdayCake: React.FC<BirthdayCakeProps> = ({ friendName, onBack }) => {
     <div className="cake-page">
       <button className="back-button" onClick={onBack}>← назад</button>
 
-      <video ref={videoRef} className="camera-feed" autoPlay playsInline muted />
+      {useCameraInput && (
+        <video ref={videoRef} className="camera-feed" autoPlay playsInline muted />
+      )}
 
       {gameState === 'idle' && (
         <div className="cake-start-screen">
           <h2>Задуй свечи!</h2>
           <p>
-            Зажги свечи на торте пальцем, а потом подуй в микрофон чтобы их задуть
+            {useCameraInput
+              ? 'Зажги свечи на торте рукой через камеру, а потом подуй в микрофон чтобы их задуть'
+              : 'Зажги свечи пальцем на экране, а потом подуй в микрофон чтобы их задуть'}
           </p>
-          <p className="cake-hint">если камера не работает — можно мышкой</p>
+          <p className="cake-hint">
+            {useCameraInput
+              ? 'если камера не работает — можно мышкой'
+              : 'на телефоне камера не нужна'}
+          </p>
           <button className="start-btn" onClick={handleStart}>
             Начать
           </button>
